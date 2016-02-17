@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Phil Lee Data Visualisation</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+
+.legend label,
+.legend span {
+  display:block;
+  float:left;
+  height:15px;
+  width:14.285%;
+  text-align:center;
+  font-size:12px;
+  margin-bottom: 8px;
+  }
+.map-legend{
+  width: 300px;
+}
+</style>
+</head>
+<body>
+
+<script src='https://api.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
+
+<!-- define javascript variable 'json' -->
+<script src="latLng_day_time.js"></script>
+<script>
+
+var data = JSON.parse(json);
+
+// if start and end points are exactly the same don't add this entry (arc.js throws error if start and end co-oradinates are the same)
+var pairs= new Array();
+for(var i=0;i<data.length;i++){
+    if (data[i]['start'][0]['LatitudeStart'] != data[i]['end'][0]['LatitudeEnd'] ||
+        data[i]['start'][0]['LongitudeStart'] != data[i]['end'][0]['LongitudeEnd'] ) {
+        pairs.push(data[i]);
+    }
+}
+
+// change LatitueStart and LongitudeStart to start; change LatitudeEnd and LongitudeEnd to end
+
+for(var i=0;i<pairs.length;i++){
+  pairs[i]['start'][0]['Latitude'] = pairs[i]['start'][0]['LatitudeStart'];
+    pairs[i]['start'][0]['Longitude'] = pairs[i]['start'][0]['LongitudeStart'];
+  pairs[i]['end'][0]['Latitude'] = pairs[i]['end'][0]['LatitudeEnd'];
+    pairs[i]['end'][0]['Longitude'] = pairs[i]['end'][0]['LongitudeEnd'];
+
+  delete pairs[i]['start'][0]['LatitudeStart'];
+  delete pairs[i]['start'][0]['LongitudeStart'];
+  delete pairs[i]['end'][0]['LatitudeEnd'];
+  delete pairs[i]['end'][0]['LongitudeEnd'];
+}
+
+</script>
+<style>
+
+.path-start {
+  -webkit-transition:stroke-dashoffset 5s ease-in;
+     -moz-transition:stroke-dashoffset 5s ease-in;
+       -o-transition:stroke-dashoffset 5s ease-in;
+          transition:stroke-dashoffset 5s ease-in;
+  }
+</style>
+
+<div id='map' class='dark'></div>
+
+<!-- map legend-->
+<div id='legend' style='display:none;'>
+  <strong>Day of the Week</strong>
+  <nav class='legend clearfix'>
+    <span style='background:#0033cc;'></span>
+    <span style='background:#00cc00;'></span>
+    <span style='background:#ffff00;'></span>
+    <span style='background:#cc0000;'></span>
+    <span style='background:#cc00cc;'></span>
+    <span style='background:#ff6600;'></span>
+    <span style='background:#0099cc;'></span>
+    <label>Mon</label>
+    <label>Tues</label>
+    <label>Wed</label>
+    <label>Thur</label>
+    <label>Fri</label>
+    <label>Sat</label>
+    <label>Sun</label>
+</div>
+<div id='map' class='dark'></div>
+
+
+<script>
+L.mapbox.accessToken = 'pk.eyJ1IjoicGpsZWUxMSIsImEiOiJjaWp3eHpsdTEwbnRndmdsemN1bDcxbHc2In0.iyBN3GPvlXERzZRW681V5w';
+
+map = L.mapbox.map('map', 'mapbox.streets')
+    .setView([52.526198, 13.393130], 15); // berlin
+
+
+map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+var credits = L.control.attribution({
+  prefix: '<p id="counter">Malte Spitz Mobile Phone Geolocation Data - By Phil Lee</p>'
+}).addTo(map);
+
+map.dragging.enable();
+map.scrollWheelZoom.enable();
+map.touchZoom.disable();
+map.doubleClickZoom.disable();
+if (map.tap) map.tap.disable();
+
+function obj(ll) {
+  return { y: ll['Latitude'], x: ll['Longitude'] }; 
+}
+
+for (var i = 0; i < pairs.length; i++) {
+
+    var lineColour = getColour(pairs[i]);
+
+    var generator = new arc.GreatCircle(
+            obj(pairs[i]['start'][0]),
+            obj(pairs[i]['end'][0]));
+    var line = generator.Arc(100, { offset: 10 });
+
+    var newLine = L.polyline(line.geometries[0].coords.map(function(c) {
+        return c.reverse();
+    }), {
+        color: lineColour,
+        weight: 5,
+        opacity: .1
+    })
+    .addTo(map);
+    var totalLength = newLine._path.getTotalLength();
+    newLine._path.classList.add('path-start');
+
+    newLine._path.style.strokeDashoffset = totalLength;
+    newLine._path.style.strokeDasharray = totalLength;
+
+    setTimeout((function(path) {
+        return function() {
+
+            path.style.strokeDashoffset = 0;
+        };
+    })(newLine._path), i * 10);
+}
+
+function getColour(entry){
+  switch (entry['Day of the Week']) {
+    case 'Monday': 
+      return '#0033cc'; //blue
+    case 'Tuesday': 
+      return '#00cc00'; //green
+    case 'Wednesday': 
+      return '#ffff00'; //yellow
+    case 'Thursday': 
+      return '#cc0000'; //red
+    case 'Friday': 
+      return '#cc00cc'; //purple
+    case 'Saturday': 
+      return '#ff6600'; //orange
+    case 'Sunday': 
+      return '#0099cc'; //light blue
+  }
+}
+
+</script>
+</body>
+</html>

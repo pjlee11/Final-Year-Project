@@ -4,11 +4,11 @@
 <meta charset=utf-8 />
 <title>Phil Lee Data Visualisation</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+
+<!-- inline stlyes-->
 <style>
   body { margin:0; padding:0; }
-  #map { position:absolute; top:0; bottom:0; width:100%; }
+  #map { position:absolute; top:0; bottom:0; width:100%; z-index: -1; }
 
 .legend label,
 .legend span {
@@ -23,43 +23,6 @@
 .map-legend{
   width: 300px;
 }
-</style>
-</head>
-<body>
-
-<script src='https://api.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
-
-<!-- define javascript variable 'json' -->
-<script src="latLng_day_time.js"></script>
-<script>
-
-var data = JSON.parse(json);
-
-// if start and end points are exactly the same don't add this entry (arc.js throws error if start and end co-oradinates are the same)
-var pairs= new Array();
-for(var i=0;i<data.length;i++){
-    if (data[i]['start'][0]['LatitudeStart'] != data[i]['end'][0]['LatitudeEnd'] ||
-        data[i]['start'][0]['LongitudeStart'] != data[i]['end'][0]['LongitudeEnd'] ) {
-        pairs.push(data[i]);
-    }
-}
-
-// change LatitueStart and LongitudeStart to start; change LatitudeEnd and LongitudeEnd to end
-
-for(var i=0;i<pairs.length;i++){
-  pairs[i]['start'][0]['Latitude'] = pairs[i]['start'][0]['LatitudeStart'];
-    pairs[i]['start'][0]['Longitude'] = pairs[i]['start'][0]['LongitudeStart'];
-  pairs[i]['end'][0]['Latitude'] = pairs[i]['end'][0]['LatitudeEnd'];
-    pairs[i]['end'][0]['Longitude'] = pairs[i]['end'][0]['LongitudeEnd'];
-
-  delete pairs[i]['start'][0]['LatitudeStart'];
-  delete pairs[i]['start'][0]['LongitudeStart'];
-  delete pairs[i]['end'][0]['LatitudeEnd'];
-  delete pairs[i]['end'][0]['LongitudeEnd'];
-}
-
-</script>
-<style>
 
 .path-start {
   -webkit-transition:stroke-dashoffset 5s ease-in;
@@ -68,6 +31,66 @@ for(var i=0;i<pairs.length;i++){
           transition:stroke-dashoffset 5s ease-in;
   }
 </style>
+</head>
+<body>
+
+<div class='options'>
+   <h1>
+    What data would you like on your map?
+   </h1>
+   
+   <p>Day of the week</p>
+   
+   <input id="day_mon" type="checkbox" name="ingredients[]" value="Monday">
+    <label for="day_mon">Monday</label>
+   <br>
+   <input id="day_tue" type="checkbox" name="ingredients[]" value="Tuesday">
+    <label for="day_tue">Tuesday</label>
+   <br>
+    <input id="day_wed" type="checkbox" name="ingredients[]" value="Wednesday">
+    <label for="day_wed">Wednesday</label>
+   <br>
+   <input id="day_thur" type="checkbox" name="ingredients[]" value="Thursday">
+    <label for="day_thur">Thursday</label>
+   <br>
+    <input id="day_fri" type="checkbox" name="ingredients[]" value="Friday">
+    <label for="day_fri">Firday</label>
+   <br>
+   <input id="day_sat" type="checkbox" name="ingredients[]" value="Saturday">
+    <label for="day_sat">Saturday</label>
+   <br>
+    <input id="day_sun" type="checkbox" name="ingredients[]" value="Sunday">
+    <label for="day_sun">Sunday</label>
+   <br>
+   
+   <p>Month of the 09/10</p>
+   
+   <input id="year_aug" type="checkbox" name="ingredients[]" value="August">
+    <label for="year_aug">August</label>
+   <br>
+   <input id="year_sep" type="checkbox" name="ingredients[]" value="September">
+    <label for="year_sep">September</label>
+   <br>
+    <input id="year_oct" type="checkbox" name="ingredients[]" value="October">
+    <label for="year_oct">October</label>
+   <br>
+   <input id="year_nov" type="checkbox" name="ingredients[]" value="November">
+    <label for="year_nov">November</label>
+   <br>
+    <input id="year_dec" type="checkbox" name="ingredients[]" value="December">
+    <label for="year_dec">December</label>
+   <br>
+   <input id="year_jan" type="checkbox" name="ingredients[]" value="January">
+    <label for="year_jan">January</label>
+   <br>
+    <input id="year_feb" type="checkbox" name="ingredients[]" value="February">
+    <label for="year_feb">February</label>
+   <br>
+   
+  <p>Time of day</p>
+   <br>
+   <button onclick="optionsSubmitted()" type="submit" value="generateMap">Create my visualisation</button>
+</div>
 
 <div id='map' class='dark'></div>
 
@@ -90,82 +113,137 @@ for(var i=0;i<pairs.length;i++){
     <label>Sat</label>
     <label>Sun</label>
 </div>
-<div id='map' class='dark'></div>
 
+<!-- pull in mapbox API and stylesheet -->
+<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+<!-- pull in arc.js API -->
+<script src='https://api.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
+<!-- define javascript variable 'json' -->
+<script src="latLng_day_time.js"></script>
 
+<!-- manipulate data to work with arc.js -->
 <script>
-L.mapbox.accessToken = 'pk.eyJ1IjoicGpsZWUxMSIsImEiOiJjaWp3eHpsdTEwbnRndmdsemN1bDcxbHc2In0.iyBN3GPvlXERzZRW681V5w';
+window.onload = function() {
+    var dirtyData = JSON.parse(json);
+    var cleanPairs = stripConsecutiveDuplicates(dirtyData);
+};
 
-map = L.mapbox.map('map', 'mapbox.streets')
-    .setView([52.526198, 13.393130], 15); // berlin
-
-
-map.legendControl.addLegend(document.getElementById('legend').innerHTML);
-
-var credits = L.control.attribution({
-  prefix: '<p id="counter">Malte Spitz Mobile Phone Geolocation Data - By Phil Lee</p>'
-}).addTo(map);
-
-map.dragging.enable();
-map.scrollWheelZoom.enable();
-map.touchZoom.disable();
-map.doubleClickZoom.disable();
-if (map.tap) map.tap.disable();
-
-function obj(ll) {
-  return { y: ll['Latitude'], x: ll['Longitude'] }; 
+// after user submits options - onclick of options 'create' button
+function optionsSubmitted() {
+	optionFilteredData = filterDataAfterOptions(cleanPairs);
+	generateMap(optionFilteredData);
 }
 
-for (var i = 0; i < pairs.length; i++) {
-
-    var lineColour = getColour(pairs[i]);
-
-    var generator = new arc.GreatCircle(
-            obj(pairs[i]['start'][0]),
-            obj(pairs[i]['end'][0]));
-    var line = generator.Arc(100, { offset: 10 });
-
-    var newLine = L.polyline(line.geometries[0].coords.map(function(c) {
-        return c.reverse();
-    }), {
-        color: lineColour,
-        weight: 5,
-        opacity: .1
-    })
-    .addTo(map);
-    var totalLength = newLine._path.getTotalLength();
-    newLine._path.classList.add('path-start');
-
-    newLine._path.style.strokeDashoffset = totalLength;
-    newLine._path.style.strokeDasharray = totalLength;
-
-    setTimeout((function(path) {
-        return function() {
-
-            path.style.strokeDashoffset = 0;
-        };
-    })(newLine._path), i * 10);
+// this method gets all the options and calls the methods required to filter the data
+function filterDataAfterOptions(cleanPairs) {
+	var optsNodeList = document.getElementsByClassName('options');
+  var daysSelected = new array();
+  
 }
 
-function getColour(entry){
-  switch (entry['Day of the Week']) {
-    case 'Monday': 
-      return '#0033cc'; //blue
-    case 'Tuesday': 
-      return '#00cc00'; //green
-    case 'Wednesday': 
-      return '#ffff00'; //yellow
-    case 'Thursday': 
-      return '#cc0000'; //red
-    case 'Friday': 
-      return '#cc00cc'; //purple
-    case 'Saturday': 
-      return '#ff6600'; //orange
-    case 'Sunday': 
-      return '#0099cc'; //light blue
-  }
+function stripConsecutiveDuplicates(data) {
+	// if start and end points are exactly the same don't add this entry (arc.js throws error if start and end co-oradinates are the same)
+	var cleanData = new Array();
+	for(var i=0;i<data.length;i++){
+		if (data[i]['start'][0]['LatitudeStart'] != data[i]['end'][0]['LatitudeEnd'] ||
+			data[i]['start'][0]['LongitudeStart'] != data[i]['end'][0]['LongitudeEnd'] ) {
+			cleanData.push(data[i]);
+		}
+	}
+
+	// change LatitueStart and LongitudeStart to start; change LatitudeEnd and LongitudeEnd to end
+	for(var i=0;i<cleanData.length;i++){
+	  cleanData[i]['start'][0]['Latitude'] = cleanData[i]['start'][0]['LatitudeStart'];
+		cleanData[i]['start'][0]['Longitude'] = cleanData[i]['start'][0]['LongitudeStart'];
+	  cleanData[i]['end'][0]['Latitude'] = cleanData[i]['end'][0]['LatitudeEnd'];
+		cleanData[i]['end'][0]['Longitude'] = cleanData[i]['end'][0]['LongitudeEnd'];
+
+	  delete cleanData[i]['start'][0]['LatitudeStart'];
+	  delete cleanData[i]['start'][0]['LongitudeStart'];
+	  delete cleanData[i]['end'][0]['LatitudeEnd'];
+	  delete cleanData[i]['end'][0]['LongitudeEnd'];
+	}
+	
+	return cleanData;
 }
 
+function generateMap(pairs) {
+	var optsNodeList = document.getElementsByClassName('options');
+	optsNodeList[0].style.display = 'none';
+
+	L.mapbox.accessToken = 'pk.eyJ1IjoicGpsZWUxMSIsImEiOiJjaWp3eHpsdTEwbnRndmdsemN1bDcxbHc2In0.iyBN3GPvlXERzZRW681V5w';
+
+	map = L.mapbox.map('map', 'mapbox.streets')
+		.setView([52.526198, 13.393130], 15); // berlin
+
+
+	map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+	var credits = L.control.attribution({
+	  prefix: '<p id="counter">Malte Spitz Mobile Phone Geolocation Data - By Phil Lee</p>'
+	}).addTo(map);
+
+	map.dragging.enable();
+	map.scrollWheelZoom.enable();
+	map.touchZoom.disable();
+	map.doubleClickZoom.disable();
+	if (map.tap) map.tap.disable();
+
+	function obj(ll) {
+	  return { y: ll['Latitude'], x: ll['Longitude'] }; 
+	}
+
+	for (var i = 0; i < pairs.length; i++) {
+
+		var lineColour = getColour(pairs[i]);
+
+		var generator = new arc.GreatCircle(
+				obj(pairs[i]['start'][0]),
+				obj(pairs[i]['end'][0]));
+		var line = generator.Arc(100, { offset: 10 });
+
+		var newLine = L.polyline(line.geometries[0].coords.map(function(c) {
+			return c.reverse();
+		}), {
+			color: lineColour,
+			weight: 5,
+			opacity: .1
+		})
+		.addTo(map);
+		var totalLength = newLine._path.getTotalLength();
+		newLine._path.classList.add('path-start');
+
+		newLine._path.style.strokeDashoffset = totalLength;
+		newLine._path.style.strokeDasharray = totalLength;
+
+		setTimeout((function(path) {
+			return function() {
+
+				path.style.strokeDashoffset = 0;
+			};
+		})(newLine._path), i * 10);
+	}
+
+	function getColour(entry){
+	  switch (entry['Day of the Week']) {
+		case 'Monday': 
+		  return '#0033cc'; //blue
+		case 'Tuesday': 
+		  return '#00cc00'; //green
+		case 'Wednesday': 
+		  return '#ffff00'; //yellow
+		case 'Thursday': 
+		  return '#cc0000'; //red
+		case 'Friday': 
+		  return '#cc00cc'; //purple
+		case 'Saturday': 
+		  return '#ff6600'; //orange
+		case 'Sunday': 
+		  return '#0099cc'; //light blue
+	  }
+	}
+}
 </script>
 </body>
 </html>
