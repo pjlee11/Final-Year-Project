@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Phil Lee Data Visualisation</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<!-- inline stlyes-->
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; z-index: -1; }
+
+.legend label,
+.legend span {
+  display:block;
+  float:left;
+  height:15px;
+  width:14.285%;
+  text-align:center;
+  font-size:12px;
+  margin-bottom: 8px;
+  }
+.map-legend{
+  width: 300px;
+}
+
+.path-start {
+  -webkit-transition:stroke-dashoffset 5s ease-in;
+     -moz-transition:stroke-dashoffset 5s ease-in;
+       -o-transition:stroke-dashoffset 5s ease-in;
+          transition:stroke-dashoffset 5s ease-in;
+  }
+</style>
+</head>
+<body>
+
+<div class='options'>
+   <h1>
+    What data would you like on your map?
+   </h1>
+   
+   <p>Day of the week</p>
+   <form class="dayForm">
+     <input type="checkbox" checked="true" name="dayOfTheWeek[]" value="Monday">
+      <label for="day_mon">Monday</label>
+     <br>
+     <input  type="checkbox" checked="true" name="dayOfTheWeek[]" value="Tuesday">
+      <label for="day_tue">Tuesday</label>
+     <br>
+      <input type="checkbox" checked="true" name="dayOfTheWeek[]" value="Wednesday">
+      <label for="day_wed">Wednesday</label>
+     <br>
+     <input  type="checkbox" checked="true" name="dayOfTheWeek[]" value="Thursday">
+      <label for="day_thur">Thursday</label>
+     <br>
+      <input type="checkbox" checked="true" name="dayOfTheWeek[]" value="Friday">
+      <label for="day_fri">Firday</label>
+     <br>
+     <input type="checkbox" checked="true" name="dayOfTheWeek[]" value="Saturday">
+      <label for="day_sat">Saturday</label>
+     <br>
+      <input type="checkbox" checked="true" name="dayOfTheWeek[]" value="Sunday">
+      <label for="day_sun">Sunday</label>
+     <br>
+   </form>
+   
+   <p>Time of day</p>
+   <form class="timeForm">
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="1">
+      <label for="time_1">01:00 - 01:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="2">
+      <label for="time_2">02:00 - 02:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="3">
+      <label for="time_3">03:00 - 03:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="4">
+      <label for="time_4">04:00 - 04:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="5">
+      <label for="time_5">05:00 - 05:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="6">
+      <label for="time_6">06:00 - 06:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="7">
+      <label for="time_7">07:00 - 07:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="8">
+      <label for="time_8">08:00 - 08:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="9">
+      <label for="time_9">09:00 - 09:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="10">
+      <label for="time_10">10:00 - 10:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="11">
+      <label for="time_11">11:00 - 11:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="12">
+      <label for="time_12">12:00 - 12:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="13">
+      <label for="time_13">13:00 - 13:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="14">
+      <label for="time_14">14:00 - 14:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="15">
+      <label for="time_15">15:00 - 15:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="16">
+      <label for="time_16">16:00 - 16:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="17">
+      <label for="time_17">17:00 - 17:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="18">
+      <label for="time_18">18:00 - 18:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="19">
+      <label for="time_19">19:00 - 19:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="20">
+      <label for="time_20">20:00 - 20:59</label>
+     <br>
+     <input type="checkbox" checked="true" name="timeOfTheDay[]" value="21">
+      <label for="time_21">21:00 - 21:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="22">
+      <label for="time_22">22:00 - 22:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="23">
+      <label for="time_23">23:00 - 23:59</label>
+     <br>
+      <input type="checkbox" checked="true" name="timeOfTheDay[]" value="0">
+      <label for="time_0">0:00 - 00:59</label>
+     <br>
+   </form>
+
+   <br>
+   <button onclick="optionsSubmitted()" type="submit" value="generateMap">Create my visualisation</button>
+</div>
+
+<div id='map' class='dark'></div>
+
+<!-- map legend-->
+<div id='legend' style='display:none;'>
+  <strong>Day of the Week</strong>
+  <nav class='legend clearfix'>
+    <span style='background:#0033cc;'></span>
+    <span style='background:#00cc00;'></span>
+    <span style='background:#ffff00;'></span>
+    <span style='background:#cc0000;'></span>
+    <span style='background:#cc00cc;'></span>
+    <span style='background:#ff6600;'></span>
+    <span style='background:#0099cc;'></span>
+    <label>Mon</label>
+    <label>Tues</label>
+    <label>Wed</label>
+    <label>Thur</label>
+    <label>Fri</label>
+    <label>Sat</label>
+    <label>Sun</label>
+</div>
+
+<!-- pull in mapbox API and stylesheet -->
+<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+<!-- pull in arc.js API -->
+<script src='https://api.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
+<!-- define javascript variable 'json' -->
+<script src="latLng_day_time.js"></script>
+
+<!-- manipulate data to work with arc.js -->
+<script>
+var cleanPairs;
+window.onload = function() {
+    var dirtyData = JSON.parse(json);
+    cleanPairs = stripConsecutiveDuplicates(dirtyData);
+};
+
+// after user submits options - onclick of options 'create' button
+function optionsSubmitted() {
+  optionFilteredData = filterDataAfterOptions(cleanPairs);
+  generateMap(optionFilteredData);
+}
+
+// this method gets all the options and calls the methods required to filter the data
+function filterDataAfterOptions(cleanPairs) {
+  var filteredDays = new Array();
+  var days = requestedDays();
+  for (var i = 0; i < cleanPairs.length; i++) {
+    if(days.includes(cleanPairs[i]['Day of the Week'])) {
+      filteredDays.push(cleanPairs[i]);
+    }
+  }
+
+  var filterPairs = new Array();
+  var times = requestedTimes();
+  for (var i = 0; i < filteredDays.length; i++) {
+    var date = new Date (new Date().toDateString() + ' ' + filteredDays[i]['Time of Day']);
+    var hour = date.getHours();
+
+    if(times.includes(hour.toString())) {
+      filterPairs.push(filteredDays[i]);
+    }
+  }
+  
+  return filterPairs;
+}
+
+function requestedDays() {
+  // get the day form and add each ticked day to the selectedDays array
+  var dayForm = document.getElementsByClassName('dayForm');
+  var daysSelected = dayForm[0].getElementsByTagName('input');
+  var selectedDays = new Array();
+  for (i = 0; i < daysSelected.length; i++) {
+    if (daysSelected[i].checked) {
+      selectedDays.push(daysSelected[i].value);
+    }
+  }
+  return selectedDays;
+}
+
+function requestedTimes() {
+  // get the time form and add each ticked day to the selectedTimes array
+  var timeForm = document.getElementsByClassName('timeForm');
+  var timeSelected = timeForm[0].getElementsByTagName('input');
+  var selectedTimes = new Array();
+  for (i = 0; i < timeSelected.length; i++) {
+    if (timeSelected[i].checked) {
+      selectedTimes.push(timeSelected[i].value);
+    }
+  }
+  return selectedTimes;
+}
+
+function stripConsecutiveDuplicates(data) {
+  // if start and end points are exactly the same don't add this entry (arc.js throws error if start and end co-oradinates are the same)
+  var cleanData = new Array();
+  for(var i=0;i<data.length;i++){
+    if (data[i]['start'][0]['LatitudeStart'] != data[i]['end'][0]['LatitudeEnd'] ||
+      data[i]['start'][0]['LongitudeStart'] != data[i]['end'][0]['LongitudeEnd'] ) {
+      cleanData.push(data[i]);
+    }
+  }
+
+  // change LatitueStart and LongitudeStart to start; change LatitudeEnd and LongitudeEnd to end
+  for(var i=0;i<cleanData.length;i++){
+    cleanData[i]['start'][0]['Latitude'] = cleanData[i]['start'][0]['LatitudeStart'];
+    cleanData[i]['start'][0]['Longitude'] = cleanData[i]['start'][0]['LongitudeStart'];
+    cleanData[i]['end'][0]['Latitude'] = cleanData[i]['end'][0]['LatitudeEnd'];
+    cleanData[i]['end'][0]['Longitude'] = cleanData[i]['end'][0]['LongitudeEnd'];
+
+    delete cleanData[i]['start'][0]['LatitudeStart'];
+    delete cleanData[i]['start'][0]['LongitudeStart'];
+    delete cleanData[i]['end'][0]['LatitudeEnd'];
+    delete cleanData[i]['end'][0]['LongitudeEnd'];
+  }
+  
+  return cleanData;
+}
+
+function generateMap(pairs) {
+  var optsNodeList = document.getElementsByClassName('options');
+  optsNodeList[0].style.display = 'none';
+
+  L.mapbox.accessToken = 'pk.eyJ1IjoicGpsZWUxMSIsImEiOiJjaWp3eHpsdTEwbnRndmdsemN1bDcxbHc2In0.iyBN3GPvlXERzZRW681V5w';
+
+  map = L.mapbox.map('map', 'mapbox.streets')
+    .setView([52.526198, 13.393130], 15); // berlin
+
+
+  map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+  var credits = L.control.attribution({
+    prefix: '<p id="counter">Malte Spitz Mobile Phone Geolocation Data - By Phil Lee</p>'
+  }).addTo(map);
+
+  map.dragging.enable();
+  map.scrollWheelZoom.enable();
+  map.touchZoom.disable();
+  map.doubleClickZoom.disable();
+  if (map.tap) map.tap.disable();
+
+  function obj(ll) {
+    return { y: ll['Latitude'], x: ll['Longitude'] }; 
+  }
+
+  for (var i = 0; i < pairs.length; i++) {
+
+    var lineColour = getColour(pairs[i]);
+
+    var generator = new arc.GreatCircle(
+        obj(pairs[i]['start'][0]),
+        obj(pairs[i]['end'][0]));
+    var line = generator.Arc(100, { offset: 10 });
+
+    var newLine = L.polyline(line.geometries[0].coords.map(function(c) {
+      return c.reverse();
+    }), {
+      color: lineColour,
+      weight: 5,
+      opacity: .1
+    })
+    .addTo(map);
+    var totalLength = newLine._path.getTotalLength();
+    newLine._path.classList.add('path-start');
+
+    newLine._path.style.strokeDashoffset = totalLength;
+    newLine._path.style.strokeDasharray = totalLength;
+
+    setTimeout((function(path) {
+      return function() {
+
+        path.style.strokeDashoffset = 0;
+      };
+    })(newLine._path), i * 10);
+  }
+
+  function getColour(entry){
+    switch (entry['Day of the Week']) {
+    case 'Monday': 
+      return '#0033cc'; //blue
+    case 'Tuesday': 
+      return '#00cc00'; //green
+    case 'Wednesday': 
+      return '#ffff00'; //yellow
+    case 'Thursday': 
+      return '#cc0000'; //red
+    case 'Friday': 
+      return '#cc00cc'; //purple
+    case 'Saturday': 
+      return '#ff6600'; //orange
+    case 'Sunday': 
+      return '#0099cc'; //light blue
+    }
+  }
+}
+</script>
+</body>
+</html>
