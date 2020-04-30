@@ -1,3 +1,1 @@
-"# Final-Year-Project" 
-
-"My name is Phil Lee, I am a student studying Digital Games Production at Brighton University. This repo contains the code I wrote to generate data visualisations I'm creating as part of my final year project. They use data recorded by a German phone company on Malte Spitz to generate each visualisation."
+This repo contains the code I wrote to generate data visualisations I'm creating as part of my final year project. They use data recorded by a German phone company on Malte Spitz to generate each visualisation
